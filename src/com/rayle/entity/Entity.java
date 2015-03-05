@@ -12,6 +12,7 @@ public abstract class Entity implements Locatable, Serializable {
 	
 	protected int x, y, z;
 	protected int hp, maxHP;
+	protected String[] options;
 	protected int instanceID = createInstanceID();
 	
 	protected int createInstanceID() {
@@ -57,6 +58,14 @@ public abstract class Entity implements Locatable, Serializable {
 
 	public void setMaxHP(int maxHP) {
 		this.maxHP = maxHP;
+	}
+	
+	public String[] getOptions() {
+		return options;
+	}
+	
+	public void setOptions(String[] options) {
+		this.options = options;
 	}
 
 	public int getInstanceID() {
