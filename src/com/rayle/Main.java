@@ -17,7 +17,7 @@ import static com.rayle.packet.PacketBytecodeIncoming.*;
 
 public class Main {
 	
-	public static final String DB_PATH = "/Users/jeremy/Desktop/.rayleServer/";
+	public static final String DB_PATH = System.getProperty("user.home") + "/Desktop/.rayleServer/";
 	
 	private static final long TICK_TIME = 100; //ms
 	private static final int PORT = 2632;

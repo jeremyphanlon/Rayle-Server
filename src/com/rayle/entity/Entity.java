@@ -1,10 +1,14 @@
 package com.rayle.entity;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
 
+import com.rayle.Main;
 import com.rayle.Tickable;
 import com.rayle.map.Locatable;
 import com.rayle.map.Location;
+import com.rayle.packet.PacketBytecodeOutgoing;
 import com.rayle.packet.Sendable;
 
 public abstract class Entity implements Locatable, Serializable, Sendable, Tickable {
@@ -63,6 +67,29 @@ public abstract class Entity implements Locatable, Serializable, Sendable, Ticka
 		this.instanceID = instanceID;
 	}
 	
-
+	@Override
+	public void send(InetAddress ip) {
+		ByteBuffer buf;
+		buf = ByteBuffer.allocate(8);
+		buf.putInt(getLocation().getX());
+		buf.putInt(instanceID);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_X, buf.array(), getLocation());
+		buf.clear();
+		buf.putInt(getLocation().getY());
+		buf.putInt(instanceID);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Y, buf.array(), getLocation());
+		buf.clear();
+		buf.putInt(getLocation().getZ());
+		buf.putInt(instanceID);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Z, buf.array(), getLocation());
+		buf.clear();
+		buf.putInt(getHp());
+		buf.putInt(instanceID);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_HP, buf.array(), getLocation());
+		buf.clear();
+		buf.putInt(getMaxHP());
+		buf.putInt(instanceID);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_MAX_HP, buf.array(), getLocation());
+	}
 	
 }

@@ -24,6 +24,7 @@ public class Player extends Entity implements Saveable<Player> {
 	private static final long serialVersionUID = 1847254033253881089L;
 	
 	private String name;
+	private int level;
 	private transient InetAddress ip;
 	private transient Location walkRequested;
 	
@@ -37,6 +38,14 @@ public class Player extends Entity implements Saveable<Player> {
 	
 	public InetAddress getIP() {
 		return ip;
+	}
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	
 	public void sendMessage(String s) {
@@ -80,29 +89,16 @@ public class Player extends Entity implements Saveable<Player> {
 	@Override
 	public void send(InetAddress ip) {
 		ByteBuffer buf = ByteBuffer.allocate(4);
-		buf.putInt(getInstanceID());
+		buf.putInt(instanceID);
 		Main.sendToAllInRange(PacketBytecodeOutgoing.NEW_PLAYER, buf.array(), getLocation());
 		
+		super.send(ip);
+		
 		buf = ByteBuffer.allocate(8);
-		buf.putInt(getLocation().getX());
 		buf.putInt(instanceID);
-		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_X, buf.array(), getLocation());
-		buf.clear();
-		buf.putInt(getLocation().getY());
-		buf.putInt(instanceID);
-		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Y, buf.array(), getLocation());
-		buf.clear();
-		buf.putInt(getLocation().getZ());
-		buf.putInt(instanceID);
-		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Z, buf.array(), getLocation());
-		buf.clear();
-		buf.putInt(getHp());
-		buf.putInt(instanceID);
-		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_HP, buf.array(), getLocation());
-		buf.clear();
-		buf.putInt(getMaxHP());
-		buf.putInt(instanceID);
-		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_MAX_HP, buf.array(), getLocation());
+		buf.putInt(level);
+		Main.sendToAllInRange(PacketBytecodeOutgoing.PLAYER_LEVEL, buf.array(), getLocation());
+		
 		buf = ByteBuffer.allocate(4 + this.name.length());
 		buf.putInt(instanceID);
 		buf.put(this.name.getBytes());
