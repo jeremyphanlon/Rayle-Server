@@ -165,6 +165,17 @@ public class Main {
 		
 	}
 	
+	public static Player getPlayerByIP(InetAddress ip) {
+		for (Player p : PLAYERS) {
+			if (p != null) {
+				if (p.getIP().equals(ip)) {
+					return p;
+				}
+			}
+		}
+		return null;
+	}
+	
 	public static boolean isServerFull() {
 		for (int i = 0; i < PLAYERS.length; i++) {
 			if (PLAYERS[i] == null) {
@@ -178,12 +189,26 @@ public class Main {
 		for (int i = 0; i < PLAYERS.length; i++) {
 			if (PLAYERS[i] == null) {
 				PLAYERS[i] = p;
+				return;
+			}
+		}
+	}
+	
+	private static void removePlayer(Player p) {
+		for (int i = 0; i < PLAYERS.length; i++) {
+			if ((PLAYERS[i] != null) && (PLAYERS[i].getName().equals(p.getName()))) {
+				PLAYERS[i] = null;
+				return;
 			}
 		}
 	}
 
 	private static void processTick() {
-		//TODO
+		for (Player p : PLAYERS) {
+			if (p != null) {
+				p.tick();
+			}
+		}
 	}
 	
 	public static void send(DatagramPacket packet) {
