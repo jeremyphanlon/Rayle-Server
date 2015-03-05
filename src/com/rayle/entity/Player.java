@@ -13,10 +13,11 @@ import java.util.Scanner;
 
 import com.rayle.Main;
 import com.rayle.db.Saveable;
+import com.rayle.map.Location;
+import com.rayle.map.Map;
 import com.rayle.packet.PacketBytecodeOutgoing;
-import com.rayle.packet.Sendable;
 
-public class Player extends Entity implements Saveable<Player>, Sendable {
+public class Player extends Entity implements Saveable<Player> {
 	
 	public static final String ACCOUNT_DB_PATH = com.rayle.Main.DB_PATH + "accounts/";
 
@@ -24,6 +25,7 @@ public class Player extends Entity implements Saveable<Player>, Sendable {
 	
 	private String name;
 	private transient InetAddress ip;
+	private transient Location walkRequested;
 	
 	public String getName() {
 		return name;
@@ -79,32 +81,47 @@ public class Player extends Entity implements Saveable<Player>, Sendable {
 	public void send(InetAddress ip) {
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(getInstanceID());
-		Main.send(ip, PacketBytecodeOutgoing.NEW_PLAYER, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.NEW_PLAYER, buf.array(), getLocation());
 		
 		buf = ByteBuffer.allocate(8);
-		buf.putInt(getX());
+		buf.putInt(getLocation().getX());
 		buf.putInt(instanceID);
-		Main.send(ip, PacketBytecodeOutgoing.ENTITY_X, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_X, buf.array(), getLocation());
 		buf.clear();
-		buf.putInt(getY());
+		buf.putInt(getLocation().getY());
 		buf.putInt(instanceID);
-		Main.send(ip, PacketBytecodeOutgoing.ENTITY_Y, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Y, buf.array(), getLocation());
 		buf.clear();
-		buf.putInt(getZ());
+		buf.putInt(getLocation().getZ());
 		buf.putInt(instanceID);
-		Main.send(ip, PacketBytecodeOutgoing.ENTITY_Z, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_Z, buf.array(), getLocation());
 		buf.clear();
 		buf.putInt(getHp());
 		buf.putInt(instanceID);
-		Main.send(ip, PacketBytecodeOutgoing.ENTITY_HP, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_HP, buf.array(), getLocation());
 		buf.clear();
 		buf.putInt(getMaxHP());
 		buf.putInt(instanceID);
-		Main.send(ip, PacketBytecodeOutgoing.ENTITY_MAX_HP, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.ENTITY_MAX_HP, buf.array(), getLocation());
 		buf = ByteBuffer.allocate(4 + this.name.length());
 		buf.putInt(instanceID);
 		buf.put(this.name.getBytes());
-		Main.send(ip, PacketBytecodeOutgoing.PLAYER_NAME, buf.array());
+		Main.sendToAllInRange(PacketBytecodeOutgoing.PLAYER_NAME, buf.array(), getLocation());
+	}
+	
+	@Override
+	public void tick() {
+		
+		if (walkRequested != null) {
+			if (getLocation().distance(walkRequested) > Map.BUFFER_DISTANCE) {
+				//TODO
+				//possibly flag for botting
+			}
+			else {
+				
+			}
+		}
+		
 	}
 	
 	public static Player getDefaultPlayer() {
@@ -112,9 +129,7 @@ public class Player extends Entity implements Saveable<Player>, Sendable {
 		p.name = "<Default Player>";
 		p.hp = 10;
 		p.maxHP = 10;
-		p.x = 0;
-		p.y = 0; 
-		p.z = 0;
+		p.location = Map.getNewPlayerStartLocation();
 		return p;
 	}
 	
@@ -153,6 +168,10 @@ public class Player extends Entity implements Saveable<Player>, Sendable {
 				String savedPassword = new Scanner(f).useDelimiter("\\Z").next();
 				
 				if (savedPassword.equals(password)) {
+					if (Main.isServerFull()) {
+						Main.send(ip, PacketBytecodeOutgoing.FAILED_LOGIN, ("The server is full at the moment. Please try again later. We apologize for the inconvenience.").getBytes());
+						return null;
+					}
 					Main.send(ip, PacketBytecodeOutgoing.SUCCESSFUL_LOGIN, new byte[0]);
 					Player p = new Player();
 					p.name = username;

@@ -8,6 +8,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 import com.rayle.entity.Player;
+import com.rayle.map.Location;
+import com.rayle.map.Map;
 import com.rayle.packet.PacketBytecodeIncoming;
 import com.rayle.packet.PacketBytecodeOutgoing;
 
@@ -22,7 +24,8 @@ public class Main {
 	private static final int CLIENT_PORT = 2631;
 	private static final int PACKET_SIZE = 1024;
 	
-	public static volatile ArrayList<Player> PLAYERS = new ArrayList<Player>();
+	private static final int MAX_PLAYERS = 2048;
+	public static volatile Player[] PLAYERS = new Player[MAX_PLAYERS];
 	
 	private static volatile ArrayList<DatagramPacket> PACKETS_TO_SEND = new ArrayList<DatagramPacket>();
 	private static volatile ArrayList<DatagramPacket> PACKETS_TO_RECEIVE = new ArrayList<DatagramPacket>();
@@ -148,7 +151,7 @@ public class Main {
 			Player p = Player.login(username, password, ip);
 			
 			if (p != null) {
-				PLAYERS.add(p);
+				addPlayer(p);
 			}
 		}
 		else if (CREATE_ACCOUNT_ATTEMPT.equals(pb)) {
@@ -160,6 +163,23 @@ public class Main {
 		}
 		
 		
+	}
+	
+	public static boolean isServerFull() {
+		for (int i = 0; i < PLAYERS.length; i++) {
+			if (PLAYERS[i] == null) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private static void addPlayer(Player p) {
+		for (int i = 0; i < PLAYERS.length; i++) {
+			if (PLAYERS[i] == null) {
+				PLAYERS[i] = p;
+			}
+		}
 	}
 
 	private static void processTick() {
@@ -181,6 +201,24 @@ public class Main {
 		}
 		
 		send(new DatagramPacket(b, b.length, ip, CLIENT_PORT));
+	}
+	
+	public static void sendToAll(PacketBytecodeOutgoing pb, byte[] data) {
+		for (Player p : PLAYERS) {
+			if (p != null) {
+				send(p.getIP(), pb, data);
+			}
+		}
+	}
+	
+	public static void sendToAllInRange(PacketBytecodeOutgoing pb, byte[] data, Location l) {
+		for (Player p : PLAYERS) {
+			if (p != null) {
+				if (p.getLocation().distance(l) <= Map.BUFFER_DISTANCE) {
+					send(p.getIP(), pb, data);
+				}
+			}
+		}
 	}
 	
 }

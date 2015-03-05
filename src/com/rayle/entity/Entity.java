@@ -2,15 +2,18 @@ package com.rayle.entity;
 
 import java.io.Serializable;
 
+import com.rayle.Tickable;
 import com.rayle.map.Locatable;
+import com.rayle.map.Location;
+import com.rayle.packet.Sendable;
 
-public abstract class Entity implements Locatable, Serializable {
+public abstract class Entity implements Locatable, Serializable, Sendable, Tickable {
 
 	private static final long serialVersionUID = 6752612263662741503L;
 	
 	private static int CURRENT_INSTANCE_ID = 0;
 	
-	protected int x, y, z;
+	protected Location location;
 	protected int hp, maxHP;
 	protected String[] options;
 	protected int instanceID = createInstanceID();
@@ -20,28 +23,12 @@ public abstract class Entity implements Locatable, Serializable {
 		return CURRENT_INSTANCE_ID;
 	}
 
-	public int getX() {
-		return x;
+	public Location getLocation() {
+		return location;
 	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public int getZ() {
-		return z;
-	}
-
-	public void setZ(int z) {
-		this.z = z;
+	
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public int getHp() {
