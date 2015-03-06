@@ -3,11 +3,12 @@ package com.rayle.packet;
 public enum PacketBytecodeOutgoing {
 
 	SEND_MESSAGE(0, 0),
-	FAILED_LOGIN(1, 0), SUCCESSFUL_LOGIN(1, 1),
+	FAILED_LOGIN(1, 0), SUCCESSFUL_LOGIN(1, 1), LOGOUT(1, 2),
 	
 	ENTITY_HP(2, 0), ENTITY_MAX_HP(2, 1), ENTITY_X(2, 2), ENTITY_Y(2, 3), ENTITY_Z(2, 4), ENTITY_ANIMATION_ID(2, 5), ENTITY_MODEL_ID(2, 6),
 			ENTITY_OPTION(2, 7), // right-click options (byte optionIndex, String optionName)
-		NEW_PLAYER(3, 0), PLAYER_NAME(3, 1), PLAYER_LEVEL(3, 2),
+		NEW_PLAYER(3, 0), PLAYER_NAME(3, 1), PLAYER_LEVEL(3, 2), 
+			PLAYER_LEAVE(3, 3), // A Player teleports or logs out (if it is a teleport, a NEW_PLAYER is sent when the player lands)
 		NEW_NPC(4, 0), NPC_NAME(4, 1), NPC_LEVEL(4, 2), NPC_ID(4, 3), NPC_COMBAT_STYLE(4, 4) ,
 			NPC_DIALOG(4, 5), //Data about what the NPC or the Player says to each other
 		

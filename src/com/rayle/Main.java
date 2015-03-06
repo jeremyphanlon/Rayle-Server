@@ -185,7 +185,7 @@ public class Main {
 		return true;
 	}
 	
-	private static void addPlayer(Player p) {
+	public static void addPlayer(Player p) {
 		for (int i = 0; i < PLAYERS.length; i++) {
 			if (PLAYERS[i] == null) {
 				PLAYERS[i] = p;
@@ -194,7 +194,7 @@ public class Main {
 		}
 	}
 	
-	private static void removePlayer(Player p) {
+	public static void removePlayer(Player p) {
 		for (int i = 0; i < PLAYERS.length; i++) {
 			if ((PLAYERS[i] != null) && (PLAYERS[i].getName().equals(p.getName()))) {
 				PLAYERS[i] = null;

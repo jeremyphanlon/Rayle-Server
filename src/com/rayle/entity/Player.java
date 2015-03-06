@@ -22,11 +22,14 @@ public class Player extends Entity implements Saveable<Player> {
 	public static final String ACCOUNT_DB_PATH = com.rayle.Main.DB_PATH + "accounts/";
 
 	private static final long serialVersionUID = 1847254033253881089L;
+
+	private static final long TIME_SINCE_COMBAT_UNTIL_LOGOUT = 10*1000;
 	
 	private String name;
 	private int level;
 	private transient InetAddress ip;
 	private transient Location walkRequested;
+	private transient long lastCombatTime;
 	
 	public String getName() {
 		return name;
@@ -114,10 +117,30 @@ public class Player extends Entity implements Saveable<Player> {
 				//possibly flag for botting
 			}
 			else {
-				
+				walk();
 			}
 		}
 		
+	}
+	
+	public void walk() {
+		if (walkRequested.equals(getLocation())) {
+			walkRequested = null;
+		}
+		else {
+			//TODO actual walking code
+		}
+	}
+	
+	public void logout() {
+		if (System.currentTimeMillis() - lastCombatTime >= TIME_SINCE_COMBAT_UNTIL_LOGOUT) {
+			Main.removePlayer(this);
+			Main.send(ip, PacketBytecodeOutgoing.LOGOUT, new byte[0]);
+			Main.sendToAllInRange(PacketBytecodeOutgoing.PLAYER_LEAVE, (this.name).getBytes(), getLocation());
+		}
+		else {
+			sendMessage("You must wait " + (TIME_SINCE_COMBAT_UNTIL_LOGOUT/1000) + " seconds after combat until logout.");
+		}
 	}
 	
 	public static Player getDefaultPlayer() {
