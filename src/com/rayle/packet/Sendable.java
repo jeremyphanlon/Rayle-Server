@@ -4,6 +4,6 @@ import java.net.InetAddress;
 
 public interface Sendable {
 
-	public void send(InetAddress ip);
+	public void sendNew(InetAddress ip);
 	
 }

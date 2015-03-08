@@ -95,12 +95,12 @@ public class NPC extends Entity {
 	}
 
 	@Override
-	public void send(InetAddress ip) {
+	public void sendNew(InetAddress ip) {
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(instanceID);
 		Main.sendToAllInRange(PacketBytecodeOutgoing.NEW_NPC, buf.array(), getLocation());
 		
-		super.send(ip);
+		super.sendNew(ip);
 		
 		buf = ByteBuffer.allocate(8);
 		buf.putInt(instanceID);

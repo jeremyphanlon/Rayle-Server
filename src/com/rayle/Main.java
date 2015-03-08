@@ -8,10 +8,12 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 import com.rayle.entity.Player;
+import com.rayle.map.Locatable;
 import com.rayle.map.Location;
 import com.rayle.map.Map;
 import com.rayle.packet.PacketBytecodeIncoming;
 import com.rayle.packet.PacketBytecodeOutgoing;
+import com.rayle.packet.Sendable;
 
 import static com.rayle.packet.PacketBytecodeIncoming.*;
 
@@ -241,6 +243,16 @@ public class Main {
 			if (p != null) {
 				if (p.getLocation().distance(l) <= Map.BUFFER_DISTANCE) {
 					send(p.getIP(), pb, data);
+				}
+			}
+		}
+	}
+	
+	public static void sendNewToAllInRange(Sendable s, Locatable l) {
+		for (Player p : PLAYERS) {
+			if (p != null) {
+				if (p.getLocation().distance(l.getLocation()) <= Map.BUFFER_DISTANCE) {
+					s.sendNew(p.getIP());
 				}
 			}
 		}

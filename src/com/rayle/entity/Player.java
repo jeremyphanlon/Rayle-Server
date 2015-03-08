@@ -90,12 +90,12 @@ public class Player extends Entity implements Saveable<Player> {
 	
 
 	@Override
-	public void send(InetAddress ip) {
+	public void sendNew(InetAddress ip) {
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(instanceID);
 		Main.sendToAllInRange(PacketBytecodeOutgoing.NEW_PLAYER, buf.array(), getLocation());
 		
-		super.send(ip);
+		super.sendNew(ip);
 		
 		buf = ByteBuffer.allocate(8);
 		buf.putInt(instanceID);
@@ -196,7 +196,7 @@ public class Player extends Entity implements Saveable<Player> {
 					p.name = username;
 					Player player = p.load();
 					player.ip = ip;
-					player.send(ip);
+					player.sendNew(ip);
 					return player;
 				}
 				else {
